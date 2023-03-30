@@ -23,7 +23,6 @@ private:
 
     // 1st dimension is the stage (IF, ID, EX, MEM, WB)
     // 2nd dimension is the pipeline width
-    // could change the 2nd dimension into a deque which might lead to an easier implementation
     std::array<std::deque<InstructionNode>, 5> instructionWindow;
 
     // variables used to determine if an incoming 
@@ -53,9 +52,11 @@ InstructionWindow::InstructionWindow(int pipelineWidth) {
 
 /**
  * @brief
- * adds a node to the instruction fetch stage
+ * adds the given node to the instruction fetch stage
  * @param instructionNode
  * the node to be added
+ * @return 
+ * returns false if adding the node to the stage failed, true otherwise
 */
 bool InstructionWindow::modeToIF(InstructionNode* instructionNode) {
     // if IF full (instructionWindow[IF].size() == pipelineWidth), return false
@@ -67,12 +68,26 @@ bool InstructionWindow::modeToIF(InstructionNode* instructionNode) {
     return false;
 }
 
+/**
+ * @brief
+ * removes the next node from the instruction fetch stage and 
+ * adds it to the instruction decode stage
+ * @return 
+ * returns false if adding the node to the stage failed, true otherwise
+*/
 bool InstructionWindow::moveIFtoID() {
     // if IF empty, return false
     // if ID full, return false
     return false;
 }
 
+/**
+ * @brief
+ * removes the next node from the instruction decode stage and 
+ * adds it to the execute stage
+ * @return 
+ * returns false if adding the node to the stage failed, true otherwise
+*/
 bool InstructionWindow::moveIDtoEX() {
     // if ID empty, return false
     // if EX full, return false
@@ -89,6 +104,13 @@ bool InstructionWindow::moveIDtoEX() {
     return false;
 }
 
+/**
+ * @brief
+ * removes the next node from the execute stage and 
+ * adds it to the memory read(store) or write(load) stage
+ * @return 
+ * returns false if adding the node to the stage failed, true otherwise
+*/
 bool InstructionWindow::moveEXtoMEM() {
     // if EX empty, return false
     // if MEM full, return false
@@ -104,6 +126,13 @@ bool InstructionWindow::moveEXtoMEM() {
     return false;
 }
 
+/**
+ * @brief
+ * removes the next node from the read(store) or write(load) stage and 
+ * adds it to the memory write back stage
+ * @return 
+ * returns false if adding the node to the stage failed, true otherwise
+*/
 bool InstructionWindow::moveMEMtoWB() {
     // if MEM empty, return false
     // if WB full, return false
@@ -114,6 +143,12 @@ bool InstructionWindow::moveMEMtoWB() {
     return false;
 }
 
+/**
+ * @brief
+ * removes the next node from the write back stage
+ * @return 
+ * returns false if adding the node to the stage failed, true otherwise
+*/
 bool InstructionWindow::moveWBtoDONE() {
     // if WB empty, return false
     return false;
