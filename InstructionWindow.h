@@ -95,7 +95,7 @@ bool InstructionWindow::moveIDtoEX() {
     // if usingIALU is true, return false
     // if usingFPU is true, return false
 
-    // check node dependancies, if any havent finished EX stage then return
+    // check node dependancies through InstructionHistory, if any of them haven't finished EX stage then return
 
     // pop node from instructionWindow[ID] and push it to instructionWindow[EX]
 
@@ -107,7 +107,7 @@ bool InstructionWindow::moveIDtoEX() {
 /**
  * @brief
  * removes the next node from the execute stage and 
- * adds it to the memory read(store) or write(load) stage
+ * adds it to the memory read(store)/write(load) stage
  * @return 
  * returns false if adding the node to the stage failed, true otherwise
 */
@@ -147,7 +147,7 @@ bool InstructionWindow::moveMEMtoWB() {
  * @brief
  * removes the next node from the write back stage
  * @return 
- * returns false if adding the node to the stage failed, true otherwise
+ * returns false if removing the node from the stage failed, true otherwise
 */
 bool InstructionWindow::moveWBtoDONE() {
     // if WB empty, return false
