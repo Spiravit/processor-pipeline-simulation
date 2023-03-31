@@ -78,6 +78,8 @@ bool InstructionWindow::modeToIF(InstructionNode* instructionNode) {
 bool InstructionWindow::moveIFtoID() {
     // if IF empty, return false
     // if ID full, return false
+
+    // pop node from instructionWindow[IF] and push it to instructionWindow[ID]
     return false;
 }
 
@@ -151,5 +153,7 @@ bool InstructionWindow::moveMEMtoWB() {
 */
 bool InstructionWindow::moveWBtoDONE() {
     // if WB empty, return false
+
+    // pop node from instructionWindow[WB]
     return false;
 }
