@@ -1,5 +1,6 @@
 #include <map>
 #include <string>
+#include <utility>
 #include "InstructionNode.h"
 
 /**
@@ -12,37 +13,54 @@ public:
     InstructionHistory();
     ~InstructionHistory();
 
-    void add(InstructionNode* instructionNode);
-    bool nodeFinished(InstructionNode* instructionNode);
+    void insert(InstructionNode* instructionNode);
+    void erase(InstructionNode* instructionNode);
+    bool isComplete(const unsigned int PC);
     
 private:
-    // std::map<!place key here!, InstructionNode> instructionHistory;
+    std::map<unsigned int, InstructionNode*> instructionHistory;
 };
 
 InstructionHistory::InstructionHistory() {
-    // initialize instruction map
-    // std::map<!place key here!, InstructionNode> instructionHistory = new std::map<!place key here!, InstructionNode>();
+    std::map<unsigned int, InstructionNode*> instructionHistory = std::map<unsigned int, InstructionNode*>();
 }
 
 InstructionHistory::~InstructionHistory() {
-    // delete all instruction nodes
+    for (std::map<unsigned int, InstructionNode*>::iterator it = instructionHistory.begin(); it != instructionHistory.end(); ++it) {
+        delete it->second;
+    }
 }
 
 /**
  * add a instruction to the history
 */
-void InstructionHistory::add(InstructionNode* instructionNode) {
-    // add instruction to map using instructionID as key
+void InstructionHistory::insert(InstructionNode* instructionNode) {
+    // pairs up the node and its key(PC)
+    instructionHistory.insert(
+        std::pair<unsigned int, InstructionNode*>(
+            instructionNode->PC, 
+            instructionNode
+        )
+    );
 }
 
 /**
- * check if instruction has been executed
+ * remove and free a instruction from the history
 */
-bool InstructionHistory::nodeFinished(InstructionNode* instructionNode) {
-    // check if instruction has been executed
-    //
-    // return true if executed
-    // return false if not executed
-    // if instruction is not in map, throw an error????
+void InstructionHistory::erase(InstructionNode* instructionNode) {
+    InstructionNode* node = instructionHistory.at(instructionNode->PC);
+    instructionHistory.erase(instructionNode->PC);
+    delete node;
+}
+
+/**
+ * returns true/false if the instruction has completed and been retired
+*/
+bool InstructionHistory::isComplete(const unsigned int PC) {
+    std::map<unsigned int, InstructionNode*>::iterator it = instructionHistory.find(PC);
+    if (it != instructionHistory.end()) {
+        // second is used to access the node out of the pair
+        return it->second->completed;
+    }
 }
 

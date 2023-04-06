@@ -2,6 +2,7 @@
 #include <array>
 
 #include "InstructionNode.h"
+#include "InstructionHistory.h"
 
 /**
  * @brief 
@@ -13,7 +14,7 @@ public:
     InstructionWindow(int pipelineWidth);
     
     // methods to switch instructions between stages
-    bool modeToIF(InstructionNode* instructionNode);
+    bool moveToIF(InstructionNode* instructionNode);
     bool moveIFtoID();
     bool moveIDtoEX();
     bool moveEXtoMEM();
@@ -23,7 +24,9 @@ private:
 
     // 1st dimension is the stage (IF, ID, EX, MEM, WB)
     // 2nd dimension is the pipeline width
-    std::array<std::deque<InstructionNode>, 5> instructionWindow;
+    std::array<std::deque<InstructionNode*>, 5> instructionWindow;
+
+    InstructionHistory* instructionHistory;
 
     // variables used to determine if an incoming 
     // node must be denied an instruction switch
@@ -43,11 +46,12 @@ private:
 };
 
 InstructionWindow::InstructionWindow(int pipelineWidth) {
-    instructionWindow = std::array<std::deque<InstructionNode>, 5>();
-
+    instructionWindow = std::array<std::deque<InstructionNode*>, 5>();
     for(int i = 0; i < 5; i++) {
-        instructionWindow[i] = std::deque<InstructionNode>();
+        instructionWindow[i] = std::deque<InstructionNode*>();
     }
+
+    InstructionHistory* instructionHistory = new InstructionHistory();
 }
 
 /**
@@ -58,11 +62,13 @@ InstructionWindow::InstructionWindow(int pipelineWidth) {
  * @return 
  * returns false if adding the node to the stage failed, true otherwise
 */
-bool InstructionWindow::modeToIF(InstructionNode* instructionNode) {
+bool InstructionWindow::moveToIF(InstructionNode* instructionNode) {
     // if IF full (instructionWindow[IF].size() == pipelineWidth), return false
     // if executingBranch is true, return false
 
     // push given node to instructionWindow[IF]
+
+    instructionHistory->insert(instructionNode);
 
     // if node is a branch, set executingBranch to true
     return false;
@@ -97,7 +103,12 @@ bool InstructionWindow::moveIDtoEX() {
     // if usingIALU is true, return false
     // if usingFPU is true, return false
 
-    // check node dependancies through InstructionHistory, if any of them haven't finished EX stage then return
+    InstructionNode* instructionNode = instructionWindow[ID].front();
+    for (const unsigned int dependency : instructionNode->dependencies) {
+        if (!instructionHistory->isComplete(dependency)) {
+            return false;
+        }    
+    }
 
     // pop node from instructionWindow[ID] and push it to instructionWindow[EX]
 
@@ -154,6 +165,7 @@ bool InstructionWindow::moveMEMtoWB() {
 bool InstructionWindow::moveWBtoDONE() {
     // if WB empty, return false
 
-    // pop node from instructionWindow[WB]
+    instructionWindow[WB].front()->completed = true;
+    instructionWindow[WB].pop_front();
     return false;
 }
