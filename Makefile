@@ -8,8 +8,8 @@ LDLIBS = -lm
 HEADERS = FileReader.h InstructionNode.h InstructionQueue.h InstructionHistory.h InstructionWindow.h Simulator.h Output.h
 
 # Create the project executable
-project: main.cpp $(HEADERS)
-	$(CXX) $(CCFLAGS) main.cpp -o project $(LDLIBS)
+proj: main.cpp $(HEADERS)
+	$(CXX) $(CCFLAGS) main.cpp -o proj $(LDLIBS)
 
 # Clean up
 clean:

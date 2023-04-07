@@ -1,12 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
 #include <sstream>
-#include <unordered_map>
-#include "InstructionNode.h"
 
-using namespace std;
+#include "InstructionNode.h"
+#include "InstructionQueue.h"
+
 /**
  * @brief
  * A class to read a file line by line.
@@ -19,12 +18,14 @@ public:
 
     ~FileReader();
 
-    vector<InstructionNode> parseTraceFile(string path, size_t start_line, size_t instruction_count);
-    vector<InstructionNode> getInstructions();
+    InstructionQueue* parseTraceFile(const string path, size_t start_line, size_t instruction_count);
+    InstructionQueue* getInstructions();
     void printInstructions();
 
+    InstructionQueue* instructions_;
+
 private:
-    vector<InstructionNode> instructions_;
+    
 };
 
 FileReader::FileReader(const string path, size_t start_line, size_t instruction_count)
@@ -32,9 +33,9 @@ FileReader::FileReader(const string path, size_t start_line, size_t instruction_
     instructions_ = parseTraceFile(path, start_line, instruction_count);
 }
 
-vector<InstructionNode> FileReader::parseTraceFile(const string path, size_t start_line, size_t instruction_count)
+InstructionQueue* FileReader::parseTraceFile(const string path, size_t start_line, size_t instruction_count)
 {
-    std::vector<InstructionNode> instructions;
+    InstructionQueue* instructions = new InstructionQueue();
     std::ifstream trace_file(path);
 
     if (!trace_file.is_open())
@@ -70,9 +71,10 @@ vector<InstructionNode> FileReader::parseTraceFile(const string path, size_t sta
             unsigned int dependency_PC = std::stoul(token, nullptr, 16);
             dependencies.push_back(dependency_PC);
         }
-
+        
         // Create instruction and add it to the list
-        instructions.emplace_back(PC, type, dependencies);
+        InstructionNode* node = new InstructionNode(PC, type, dependencies);
+        instructions->push(node);
         ++parsed_count;
     }
 
@@ -80,18 +82,19 @@ vector<InstructionNode> FileReader::parseTraceFile(const string path, size_t sta
     return instructions;
 }
 
-vector<InstructionNode> FileReader::getInstructions()
+InstructionQueue* FileReader::getInstructions()
 {
     return instructions_;
 }
+
 // Function to print the parsed instructions to the console
 void FileReader::printInstructions()
 {
-    for (const auto &instruction : instructions_)
+    for (const auto &instruction : instructions_->getInstructionQueue())
     {
-        std::cout << "PC: " << std::hex << instruction.PC << std::dec << ", Type: " << instruction.type;
+        std::cout << "PC: " << std::hex << instruction->PC << std::dec << ", Type: " << instruction->type;
         std::cout << ", Dependencies: ";
-        for (const auto &dependency : instruction.dependencies)
+        for (const auto &dependency : instruction->dependencies)
         {
             std::cout << std::hex << dependency << std::dec << " ";
         }

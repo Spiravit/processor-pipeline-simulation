@@ -2,6 +2,9 @@
 
 #include "InstructionNode.h"
 
+#ifndef INSTRUCTIONQUEUE_H
+#define INSTRUCTIONQUEUE_H
+
 /**
  * @brief
  * data structure to hold the instructions 
@@ -12,6 +15,8 @@ public:
     InstructionQueue();
     void push(InstructionNode* instructionNode);
     InstructionNode* pop();
+
+    std::deque<InstructionNode*> getInstructionQueue();
 
 private:
     std::deque<InstructionNode*> instructionQueue;
@@ -42,3 +47,18 @@ InstructionNode* InstructionQueue::pop() {
     instructionQueue.pop_front();
     return instructionNode;
 }
+
+/**
+ * @brief
+ * only really here for the print method in the FileReader class
+ * and it should not be used anywhere else
+ * @return 
+ * the instruction queue (well its really a deque)
+*/
+std::deque<InstructionNode*> InstructionQueue::getInstructionQueue() {
+    return instructionQueue;
+}
+
+
+
+#endif

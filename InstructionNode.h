@@ -23,6 +23,14 @@ class InstructionNode {
         : PC(PC), type(type), dependencies(dependencies) {}
 };
 
+enum class InstructionType
+{
+    INTEGER,
+    FLOATING_POINT,
+    BRANCH,
+    LOAD,
+    STORE
+};
 
 enum class InstructionState
 {

@@ -1,9 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <vector>
+
 #include "FileReader.h"
 #include "InstructionNode.h"
+#include "InstructionQueue.h"
+#include "Simulator.h"
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -20,9 +23,10 @@ int main(int argc, char *argv[])
     FileReader parser = FileReader(path, atoi(argv[2]), atoi(argv[3]));
 
     // Get the parsed instructions and print them to the console
-    vector<InstructionNode> instructions = parser.getInstructions();
+    InstructionQueue* instructionQueue = parser.getInstructions();
     parser.printInstructions();
 
-    // TODO: Implement the rest of the simulation
+    Simulator simulator = Simulator(instructionQueue);
+    simulator.start();
     return 0;
 }

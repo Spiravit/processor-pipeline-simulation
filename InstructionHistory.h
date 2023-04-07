@@ -14,7 +14,7 @@ public:
     ~InstructionHistory();
 
     void insert(InstructionNode* instructionNode);
-    void erase(InstructionNode* instructionNode);
+    void erase(unsigned int PC);
     bool isComplete(const unsigned int PC);
     
 private:
@@ -35,6 +35,9 @@ InstructionHistory::~InstructionHistory() {
  * add a instruction to the history
 */
 void InstructionHistory::insert(InstructionNode* instructionNode) {
+    // erase the instruction if it already exists
+    erase(instructionNode->PC);
+
     // pairs up the node and its key(PC)
     instructionHistory.insert(
         std::pair<unsigned int, InstructionNode*>(
@@ -47,10 +50,13 @@ void InstructionHistory::insert(InstructionNode* instructionNode) {
 /**
  * remove and free a instruction from the history
 */
-void InstructionHistory::erase(InstructionNode* instructionNode) {
-    InstructionNode* node = instructionHistory.at(instructionNode->PC);
-    instructionHistory.erase(instructionNode->PC);
-    delete node;
+void InstructionHistory::erase(unsigned int PC) {
+    std::map<unsigned int, InstructionNode*>::iterator it = instructionHistory.find(PC);
+
+    if (it != instructionHistory.end()) { // if the instruction exists
+        instructionHistory.erase(it);
+        delete it->second;
+    }
 }
 
 /**
@@ -58,7 +64,8 @@ void InstructionHistory::erase(InstructionNode* instructionNode) {
 */
 bool InstructionHistory::isComplete(const unsigned int PC) {
     std::map<unsigned int, InstructionNode*>::iterator it = instructionHistory.find(PC);
-    if (it != instructionHistory.end()) {
+
+    if (it != instructionHistory.end()) { // if the instruction exists
         // second is used to access the node out of the pair
         return it->second->completed;
     }
