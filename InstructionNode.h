@@ -61,10 +61,12 @@ public:
         return instructionType == InstructionType::BRANCH;
     }
 
+
     bool isLoad()
     {
         return instructionType == InstructionType::LOAD;
     }
+
 
     bool isStore()
     {
