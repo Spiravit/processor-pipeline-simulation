@@ -129,7 +129,7 @@ bool InstructionWindow::moveIDtoEX()
     }
 
     InstructionNode *instructionNode = instructionWindow[ID].front();
-    
+
     for (const unsigned int dependency : instructionNode->dependencies)
     {
         if (!instructionHistory->isComplete(dependency))
