@@ -69,5 +69,7 @@ bool InstructionHistory::isComplete(const unsigned int PC) {
         // second is used to access the node out of the pair
         return it->second->completed;
     }
+    
+    return true; // ignore dependencies if instruction does not exist
 }
 

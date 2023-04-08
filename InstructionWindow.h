@@ -20,6 +20,8 @@ public:
     bool moveEXtoMEM();
     bool moveMEMtoWB();
     bool moveWBtoDONE();
+
+    bool isEmpty();
 private: 
 
     // 1st dimension is the stage (IF, ID, EX, MEM, WB)
@@ -51,7 +53,7 @@ InstructionWindow::InstructionWindow(int pipelineWidth) {
         instructionWindow[i] = std::deque<InstructionNode*>();
     }
 
-    InstructionHistory* instructionHistory = new InstructionHistory();
+    instructionHistory = new InstructionHistory();
 }
 
 /**
@@ -168,4 +170,8 @@ bool InstructionWindow::moveWBtoDONE() {
     instructionWindow[WB].front()->completed = true;
     instructionWindow[WB].pop_front();
     return false;
+}
+
+bool InstructionWindow::isEmpty() {
+    return (instructionWindow[IF].empty() && instructionWindow[ID].empty() && instructionWindow[EX].empty()  && instructionWindow[MEM].empty() && instructionWindow[WB].empty());
 }
