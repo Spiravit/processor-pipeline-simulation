@@ -18,6 +18,9 @@ int main(int argc, char *argv[])
     }
 
     string path = argv[1];
+    int start_inst = atoi(argv[2]);
+    int inst_count = atoi(argv[3]);
+    int pipelineWidth = atoi(argv[4]);
 
     // Create a TraceFileParser object and parse the trace file
     FileReader parser = FileReader(path, atoi(argv[2]), atoi(argv[3]));
@@ -26,7 +29,7 @@ int main(int argc, char *argv[])
     InstructionQueue* instructionQueue = parser.getInstructions();
     parser.printInstructions();
 
-    Simulator simulator = Simulator(instructionQueue);
+    Simulator simulator = Simulator(instructionQueue, pipelineWidth);
     simulator.start();
     return 0;
 }

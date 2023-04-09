@@ -12,16 +12,6 @@
 #include <unordered_map>
 
 using namespace std;
-class InstructionNode {
- public:
-    unsigned int PC;
-    int type;
-    std::vector<unsigned int> dependencies;
-    bool completed; // added this var so i dont think we need the instruction state class anymore
-
-    InstructionNode(unsigned int PC, int type, const std::vector<unsigned int>& dependencies)
-        : PC(PC), type(type), dependencies(dependencies) {}
-};
 
 enum class InstructionType
 {
@@ -41,5 +31,33 @@ enum class InstructionState
     COMPLETED
 };
 
+class InstructionNode {
+ public:
+    unsigned int PC;
+    int type;
+    std::vector<unsigned int> dependencies;
+    bool completed; // added this var so i dont think we need the instruction state class anymore
+    InstructionType getType();
 
+    InstructionNode(unsigned int PC, int type, const std::vector<unsigned int>& dependencies)
+        : PC(PC), type(type), dependencies(dependencies) {}
+};
+
+
+InstructionType InstructionNode::getType() {
+    switch (type) {
+        case 0:
+            return InstructionType::INTEGER;
+        case 1:
+            return InstructionType::FLOATING_POINT;
+        case 2:
+            return InstructionType::BRANCH;
+        case 3:
+            return InstructionType::LOAD;
+        case 4:
+            return InstructionType::STORE;
+        default:
+            throw std::invalid_argument("Invalid instruction type");
+    }
+}
 #endif // INSTRUCTION_H
