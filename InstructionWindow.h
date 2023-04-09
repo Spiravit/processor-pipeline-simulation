@@ -22,6 +22,7 @@ public:
     bool moveMEMtoWB();
     bool moveWBtoDONE();
 
+
     bool isEmpty();
 
 private:
@@ -46,7 +47,8 @@ private:
     const int ID = 1;  // instruction decode
     const int EX = 2;  // execute
     const int MEM = 3; // memory read(load) or write(store)
-    const int WB = 4;  // write back
+    const int WB = 4; // write back
+
 };
 
 InstructionWindow::InstructionWindow(int pipelineWidth)
@@ -269,6 +271,13 @@ bool InstructionWindow::moveWBtoDONE()
     instructionWindow[WB].pop_front();
     return false;
 }
+
+/**
+ * @brief
+ * check if there is instruction
+ * @return 
+ * returns true if the Window is empty
+*/
 
 bool InstructionWindow::isEmpty()
 {
