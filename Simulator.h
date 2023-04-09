@@ -61,7 +61,7 @@ void Simulator::start() {
         } 
         while (instructionNode != nullptr && instructionWindow->moveToIF(instructionNode)) {
             instructionQueue->pop();
-            switch (instructionNode->getType()) {
+            switch (instructionNode->instructionType) {
                 case InstructionType::INTEGER:
                     integerCount++;
                     break;
