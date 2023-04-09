@@ -1,11 +1,11 @@
 # Define what compiler to use and the flags.
 CC = cc
 CXX = g++
-CCFLAGS = -g -std=c++11 -Wall -Werror -Wno-unused-variable -Wno-unused-private-field
+CCFLAGS = -g -std=c++11 -Wall -Werror
 LDLIBS = -lm
 
 # List all header files
-HEADERS = FileReader.h InstructionNode.h InstructionQueue.h InstructionHistory.h InstructionWindow.h Simulator.h Output.h
+HEADERS = FileReader.h InstructionNode.h InstructionQueue.h InstructionHistory.h InstructionWindow.h Simulator.h
 
 # Create the project executable
 proj: main.cpp $(HEADERS)

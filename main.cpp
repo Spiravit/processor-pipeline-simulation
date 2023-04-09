@@ -23,14 +23,14 @@ int main(int argc, char *argv[])
     int pipelineWidth = atoi(argv[4]);
 
     // Create a TraceFileParser object and parse the trace file
-    FileReader parser = FileReader(path, atoi(argv[2]), atoi(argv[3]));
+    FileReader parser = FileReader(path, start_inst, inst_count);
 
     // Get the parsed instructions and print them to the console
     InstructionQueue* instructionQueue = parser.getInstructions();
-    parser.printInstructions();
+    //parser.printInstructions();
 
 
-    Simulator simulator = Simulator(instructionQueue, atoi(argv[4]));
+    Simulator simulator = Simulator(instructionQueue, pipelineWidth);
     simulator.start();
     return 0;
 }

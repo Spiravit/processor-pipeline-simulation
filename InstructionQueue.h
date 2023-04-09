@@ -61,8 +61,6 @@ InstructionNode* InstructionQueue::front() {
     return instructionNode;
 }
 
-
-
 /**
  * @brief
  * only really here for the print method in the FileReader class
