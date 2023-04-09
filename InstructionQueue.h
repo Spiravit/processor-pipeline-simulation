@@ -50,10 +50,6 @@ InstructionNode* InstructionQueue::pop() {
     return instructionNode;
 }
 
-bool InstructionQueue::isEmpty() {
-    return instructionQueue.empty();
-}
-
 /**
  * @brief
  * reference to the first node of queue
