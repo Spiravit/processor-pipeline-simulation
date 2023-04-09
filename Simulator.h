@@ -2,6 +2,7 @@
 #include "InstructionWindow.h"
 #include "InstructionNode.h"
 
+
 class Simulator {
 public:
     Simulator(InstructionQueue* instructionQueue, int pipelineWidth);
@@ -14,6 +15,7 @@ private:
     InstructionWindow* instructionWindow;
 
     unsigned int instructionCycleCount = 0;
+    
     // instruction type counts
     unsigned int integerCount = 0;
     unsigned int floatingPointCount = 0;
@@ -24,17 +26,17 @@ private:
 
 Simulator::Simulator(InstructionQueue* instructionQueue, int pipelineWidth) {
     this->instructionQueue = instructionQueue;
-    instructionWindow = new InstructionWindow(pipelineWidth);
+    this->instructionWindow = new InstructionWindow(pipelineWidth);
 }
 
 void Simulator::start() {
     // repeat until InstuctionQueue and InstructionWindow are empty
-        // call moveWBtoDONE() in a while loop until it returns false
-        // call moveMEMtoWB() in a while loop until it returns false
-        // call moveEXtoMEM() in a while loop until it returns false
-        // call moveIDtoEX() in a while loop until it returns false
-        // call moveIFtoID() in a while loop until it returns false
-        // call modeToIF(InstructionNode* instructionNode) in a while loop until it returns false or until InstructionQueue is empty
+        // call instructionWindow.moveWBtoDONE() in a while loop until it returns false
+        // call instructionWindow.moveMEMtoWB() in a while loop until it returns false
+        // call instructionWindow.moveEXtoMEM() in a while loop until it returns false
+        // call instructionWindow.moveIDtoEX() in a while loop until it returns false
+        // call instructionWindow.moveIFtoID() in a while loop until it returns false
+        // call instructionWindow.modeToIF(InstructionNode* instructionNode) in a while loop until it returns false or until InstructionQueue is empty
             // if true is returned, pop node from InstructionQueue
             // increment count of instruction type
         // increment instructionCycleCount 

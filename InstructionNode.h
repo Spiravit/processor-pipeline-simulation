@@ -1,5 +1,5 @@
 /**
- * @brief 
+ * @brief
  * node used to store an instruction
  */
 #ifndef INSTRUCTION_H
@@ -13,39 +13,25 @@
 
 using namespace std;
 
-enum class InstructionType
+class InstructionNode
 {
-    INTEGER,
-    FLOATING_POINT,
-    BRANCH,
-    LOAD,
-    STORE
-};
-
-enum class InstructionState
-{
-    FETCHED,
-    DECODED,
-    EXECUTING,
-    MEMORY_ACCESS,
-    COMPLETED
-};
-
-class InstructionNode {
- public:
+public:
     unsigned int PC;
-    int type;
+    int type;                        // int instruction type : 0 = integer, 1 = float, 2 = branch, 3 = load, 4 = store
+    InstructionType instructionType; // Enum instruction type (integer, float, branch, load, store)
     std::vector<unsigned int> dependencies;
     bool completed; // added this var so i dont think we need the instruction state class anymore
-    InstructionType getType();
 
-    InstructionNode(unsigned int PC, int type, const std::vector<unsigned int>& dependencies)
-        : PC(PC), type(type), dependencies(dependencies) {}
-};
+    InstructionNode(unsigned int PC, int type, const std::vector<unsigned int> &dependencies)
+        : PC(PC), type(type), dependencies(dependencies)
+    {
+        instructionType = toInstructionType(type);
+    }
 
-
-InstructionType InstructionNode::getType() {
-    switch (type) {
+    InstructionType toInstructionType(int type)
+    {
+        switch (type)
+        {
         case 0:
             return InstructionType::INTEGER;
         case 1:
@@ -57,7 +43,51 @@ InstructionType InstructionNode::getType() {
         case 4:
             return InstructionType::STORE;
         default:
-            throw std::invalid_argument("Invalid instruction type");
+            return InstructionType::INTEGER;
+        }
     }
-}
+
+    bool isInteger()
+    {
+        return instructionType == InstructionType::INTEGER;
+    }
+
+    bool isFloat()
+    {
+        return instructionType == InstructionType::FLOATING_POINT;
+    }
+
+    bool isBranch()
+    {
+        return instructionType == InstructionType::BRANCH;
+    }
+
+    bool isLoad()
+    {
+        return instructionType == InstructionType::LOAD;
+    }
+
+    bool isStore()
+    {
+        return instructionType == InstructionType::STORE;
+    }
+};
+
+enum class InstructionType
+{
+    INTEGER,
+    FLOATING_POINT,
+    BRANCH,
+    LOAD,
+    STORE
+};
+enum class InstructionState
+{
+    FETCHED,
+    DECODED,
+    EXECUTING,
+    MEMORY_ACCESS,
+    COMPLETED
+};
+
 #endif // INSTRUCTION_H

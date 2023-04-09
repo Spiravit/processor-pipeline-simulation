@@ -11,9 +11,9 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    if (argc != 4)
+    if (argc != 5)
     {
-        cout << "Usage: ./program path_to_trace_file start_instruction_# instruction_count" << endl;
+        cout << "Usage: ./program path_to_trace_file start_instruction_# instruction_count pipeline_width" << endl;
         return 1;
     }
 
@@ -29,7 +29,8 @@ int main(int argc, char *argv[])
     InstructionQueue* instructionQueue = parser.getInstructions();
     parser.printInstructions();
 
-    Simulator simulator = Simulator(instructionQueue, pipelineWidth);
+
+    Simulator simulator = Simulator(instructionQueue, atoi(argv[4]));
     simulator.start();
     return 0;
 }

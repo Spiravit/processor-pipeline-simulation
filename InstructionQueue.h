@@ -16,6 +16,7 @@ public:
     void push(InstructionNode* instructionNode);
     InstructionNode* pop();
     InstructionNode* front();
+
     bool isEmpty();
 
     std::deque<InstructionNode*> getInstructionQueue();
@@ -47,6 +48,10 @@ InstructionNode* InstructionQueue::pop() {
     InstructionNode* instructionNode = instructionQueue.front();
     instructionQueue.pop_front();
     return instructionNode;
+}
+
+bool InstructionQueue::isEmpty() {
+    return instructionQueue.empty();
 }
 
 /**
