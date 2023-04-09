@@ -1,7 +1,7 @@
 # Define what compiler to use and the flags.
 CC = cc
 CXX = g++
-CCFLAGS = -g -std=c++11 -Wall -Werror
+CCFLAGS = -g -std=c++11 -Wall -Werror -Wno-unused-variable -Wno-unused-private-field
 LDLIBS = -lm
 
 # List all header files
