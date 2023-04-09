@@ -13,6 +13,23 @@
 
 using namespace std;
 
+enum class InstructionType
+{
+    INTEGER,
+    FLOATING_POINT,
+    BRANCH,
+    LOAD,
+    STORE
+};
+enum class InstructionState
+{
+    FETCHED,
+    DECODED,
+    EXECUTING,
+    MEMORY_ACCESS,
+    COMPLETED
+};
+
 class InstructionNode
 {
 public:
@@ -73,21 +90,6 @@ public:
     }
 };
 
-enum class InstructionType
-{
-    INTEGER,
-    FLOATING_POINT,
-    BRANCH,
-    LOAD,
-    STORE
-};
-enum class InstructionState
-{
-    FETCHED,
-    DECODED,
-    EXECUTING,
-    MEMORY_ACCESS,
-    COMPLETED
-};
+
 
 #endif // INSTRUCTION_H
