@@ -2,6 +2,9 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <iomanip>
+
+#include <limits.h>
 
 #include "InstructionNode.h"
 #include "InstructionQueue.h"
@@ -58,17 +61,21 @@ InstructionQueue* FileReader::parseTraceFile(const string path, size_t start_lin
 
         // Parse program counter (PC)
         std::getline(ss, token, ',');
-        unsigned int PC = std::stoul(token, nullptr, 16);
+
+        unsigned long long PC = std::stoull(token, nullptr, 16);
+
+        // cout << "hex: " << token << endl;
+        // cout << "PC: " << PC << endl;
 
         // Parse instruction type
         std::getline(ss, token, ',');
         int type = std::stoi(token);
 
         // Parse dependencies
-        std::vector<unsigned int> dependencies;
+        std::vector<unsigned long long> dependencies;
         while (std::getline(ss, token, ','))
         {
-            unsigned int dependency_PC = std::stoul(token, nullptr, 16);
+            unsigned long long dependency_PC = std::stoul(token, nullptr, 16);
             dependencies.push_back(dependency_PC);
         }
         

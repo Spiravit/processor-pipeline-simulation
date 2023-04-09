@@ -134,7 +134,7 @@ bool InstructionWindow::moveIDtoEX()
         return false;
     }
 
-    for (const unsigned int dependency : instructionNode->dependencies)
+    for (const unsigned long long dependency : instructionNode->dependencies)
     {
         if (!instructionHistory->isComplete(dependency))
         {
@@ -194,17 +194,21 @@ bool InstructionWindow::moveEXtoMEM()
     }
 
     // Reset usingIALU, usingFPU, and executingBranch flags based on the instruction node type
+    // set completed flag to true
     if (instructionNode->isInteger())
     {
         usingIALU = false;
+        instructionNode->completed = true;
     }
     else if (instructionNode->isFloat())
     {
         usingFPU = false;
+        instructionNode->completed = true;
     }
     else if (instructionNode->isBranch())
     {
         executingBranch = false;
+        instructionNode->completed = true;
     }
 
     // set usingCRP or usingCWP true based on whether the node is a load or store type
@@ -245,13 +249,16 @@ bool InstructionWindow::moveMEMtoWB()
     instructionWindow[MEM].pop_front();
 
     // Reset usingCRP or usingCWP flags based on whether the node is a load or store type
+    // and set the instruction node to complete
     if (instructionNode->isLoad())
     {
         usingCRP = false;
+        instructionNode->completed = true;
     }
     else if (instructionNode->isStore())
     {
         usingCWP = false;
+        instructionNode->completed = true;
     }
 
     return true;
@@ -271,12 +278,17 @@ bool InstructionWindow::moveWBtoDONE()
         return false;
     }
 
-    instructionWindow[WB].front()->completed = true;
     instructionWindow[WB].pop_front();
     return true;
 }
 
 bool InstructionWindow::isEmpty()
 {
-    return (instructionWindow[IF].empty() && instructionWindow[ID].empty() && instructionWindow[EX].empty() && instructionWindow[MEM].empty() && instructionWindow[WB].empty());
+    return (
+        instructionWindow[IF].empty() && 
+        instructionWindow[ID].empty() && 
+        instructionWindow[EX].empty() && 
+        instructionWindow[MEM].empty() && 
+        instructionWindow[WB].empty()
+    );
 }

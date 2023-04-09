@@ -21,25 +21,17 @@ enum class InstructionType
     LOAD,
     STORE
 };
-enum class InstructionState
-{
-    FETCHED,
-    DECODED,
-    EXECUTING,
-    MEMORY_ACCESS,
-    COMPLETED
-};
 
 class InstructionNode
 {
 public:
-    unsigned int PC;
-    int type;                        // int instruction type : 0 = integer, 1 = float, 2 = branch, 3 = load, 4 = store
+    unsigned long long PC;
+    int type;                        // int instruction type : 1 = integer, 2 = float, 3 = branch, 4 = load, 5 = store
     InstructionType instructionType; // Enum instruction type (integer, float, branch, load, store)
-    std::vector<unsigned int> dependencies;
-    bool completed; // added this var so i dont think we need the instruction state class anymore
+    std::vector<unsigned long long> dependencies;
+    bool completed;
 
-    InstructionNode(unsigned int PC, int type, const std::vector<unsigned int> &dependencies)
+    InstructionNode(unsigned long long PC, int type, const std::vector<unsigned long long> &dependencies)
         : PC(PC), type(type), dependencies(dependencies)
     {
         instructionType = toInstructionType(type);
