@@ -49,18 +49,18 @@ public:
     {
         switch (type)
         {
-        case 0:
-            return InstructionType::INTEGER;
         case 1:
-            return InstructionType::FLOATING_POINT;
+            return InstructionType::INTEGER;
         case 2:
-            return InstructionType::BRANCH;
+            return InstructionType::FLOATING_POINT;
         case 3:
-            return InstructionType::LOAD;
+            return InstructionType::BRANCH;
         case 4:
+            return InstructionType::LOAD;
+        case 5:
             return InstructionType::STORE;
         default:
-            return InstructionType::INTEGER;
+            throw "Invalid instruction type in InstructionNode::toInstructionType()";
         }
     }
 

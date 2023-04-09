@@ -77,6 +77,9 @@ void Simulator::start() {
                 case InstructionType::STORE:
                     storeCount++;
                     break;
+                default :
+                    throw "Invalid Instruction Type in Simulator::start()";
+
             }
             
             instructionNode = instructionQueue->front();
@@ -99,10 +102,10 @@ void Simulator::printResults() {
     }
 
     std::cout << "Total Instructions: " << total << std::endl;
-    std::cout << "Integer Instructions: " << (integerCount / total) * 100 << std::endl;
-    std::cout << "Floating Point Instructions: " << (floatingPointCount / total) * 100 << "%" << std::endl;
-    std::cout << "Branch Instructions: " << (branchCount / total) * 100 << "%" << std::endl;
-    std::cout << "Load Instructions: " << (loadCount / total) * 100 << "%" << std::endl;
-    std::cout << "Store Instructions: " << (storeCount / total) * 100 << "%" << std::endl;
-    std::cout << "Total Cycles: " << instructionCycleCount << "%" << std::endl;
+    std::cout << "Integer Instructions: " << ((double)integerCount / (double)total) * 100 << "%" << std::endl;
+    std::cout << "Floating Point Instructions: " << ((double)floatingPointCount / (double)total) * 100 << "%" << std::endl;
+    std::cout << "Branch Instructions: " << ((double)branchCount / (double)total) * 100 << "%" << std::endl;
+    std::cout << "Load Instructions: " << ((double)loadCount / (double)total) * 100 << "%" << std::endl;
+    std::cout << "Store Instructions: " << ((double)storeCount / (double)total) * 100 << "%" << std::endl;
+    std::cout << "Total Cycles: " << instructionCycleCount  << std::endl;
 }

@@ -41,7 +41,7 @@ void InstructionHistory::insert(InstructionNode* instructionNode) {
     // pairs up the node and its key(PC)
     instructionHistory.insert(
         std::pair<unsigned int, InstructionNode*>(
-            instructionNode->PC, 
+            instructionNode->PC,
             instructionNode
         )
     );
@@ -53,9 +53,10 @@ void InstructionHistory::insert(InstructionNode* instructionNode) {
 void InstructionHistory::erase(unsigned int PC) {
     std::map<unsigned int, InstructionNode*>::iterator it = instructionHistory.find(PC);
 
-    if (it != instructionHistory.end()) { // if the instruction exists
+    if (it != instructionHistory.end()) { // if the instruction exists 
         instructionHistory.erase(it);
-        delete it->second;
+        //delete it->second;
+        // TODO: fix this delete statement, it causes a crash
     }
 }
 
@@ -72,4 +73,3 @@ bool InstructionHistory::isComplete(const unsigned int PC) {
     
     return true; // ignore dependencies if instruction does not exist
 }
-

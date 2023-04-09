@@ -12,9 +12,10 @@
 class InstructionWindow
 {
 public:
-    InstructionWindow(int pipelineWidth);
+    InstructionWindow(unsigned int pipelineWidth);
 
     // methods to switch instructions between stages
+
     bool moveToIF(InstructionNode *instructionNode);
     bool moveIFtoID();
     bool moveIDtoEX();
@@ -22,11 +23,10 @@ public:
     bool moveMEMtoWB();
     bool moveWBtoDONE();
 
-
     bool isEmpty();
 
 private:
-    int pipelineWidth;
+    unsigned int pipelineWidth;
     // 1st dimension is the stage (IF, ID, EX, MEM, WB)
     // 2nd dimension is the pipeline width
     std::array<std::deque<InstructionNode *>, 5> instructionWindow;
@@ -47,11 +47,10 @@ private:
     const int ID = 1;  // instruction decode
     const int EX = 2;  // execute
     const int MEM = 3; // memory read(load) or write(store)
-    const int WB = 4; // write back
-
+    const int WB = 4;  // write back
 };
 
-InstructionWindow::InstructionWindow(int pipelineWidth)
+InstructionWindow::InstructionWindow(unsigned int pipelineWidth)
 {
     this->pipelineWidth = pipelineWidth;
     instructionWindow = std::array<std::deque<InstructionNode *>, 5>();
@@ -60,7 +59,7 @@ InstructionWindow::InstructionWindow(int pipelineWidth)
         instructionWindow[i] = std::deque<InstructionNode *>();
     }
 
-    InstructionHistory *instructionHistory = new InstructionHistory();
+    instructionHistory = new InstructionHistory();
 }
 
 /**
@@ -81,9 +80,6 @@ bool InstructionWindow::moveToIF(InstructionNode *instructionNode)
     // Push the given node to the IF stage
     instructionWindow[IF].push_back(instructionNode);
 
-    // Add the instructionNode to the instruction history
-    instructionHistory->insert(instructionNode);
-
     // If the node is a branch instruction, set executingBranch to true
     if (instructionNode->isBranch())
     {
@@ -101,7 +97,7 @@ bool InstructionWindow::moveToIF(InstructionNode *instructionNode)
  * returns false if adding the node to the stage failed, true otherwise
  */
 bool InstructionWindow::moveIFtoID()
-{
+{   
     // if IF empty, return false || // if ID full, return false
     if (instructionWindow[IF].empty() || instructionWindow[ID].size() >= this->pipelineWidth)
     {
@@ -123,20 +119,20 @@ bool InstructionWindow::moveIFtoID()
  * returns false if adding the node to the stage failed, true otherwise
  */
 bool InstructionWindow::moveIDtoEX()
-{
+{   
     // if ID empty, return false || if EX full, return false
     if (instructionWindow[ID].empty() || instructionWindow[EX].size() >= this->pipelineWidth)
     {
         return false;
     }
 
+    InstructionNode *instructionNode = instructionWindow[ID].front();
+
     // if usingIALU is true || usingFPU is true, return false
-    if (usingIALU || usingFPU)
+    if ((instructionNode->isInteger() && usingIALU) || (instructionNode->isFloat() && usingFPU))
     {
         return false;
     }
-
-    InstructionNode *instructionNode = instructionWindow[ID].front();
 
     for (const unsigned int dependency : instructionNode->dependencies)
     {
@@ -146,9 +142,14 @@ bool InstructionWindow::moveIDtoEX()
         }
     }
 
+    // Add the instructionNode to the instruction history
+    instructionHistory->insert(instructionNode);
+
     // pop node from instructionWindow[ID] and push it to instructionWindow[EX]
-    instructionWindow[EX].push_back(instructionWindow[ID].front());
+    instructionWindow[EX].push_back(instructionNode);
+    
     instructionWindow[ID].pop_front();
+
     // set usingIALU true if instruction node is a integer type
     if (instructionNode->isInteger())
     {
@@ -159,6 +160,7 @@ bool InstructionWindow::moveIDtoEX()
     {
         usingFPU = true;
     }
+    
     return true;
 }
 
@@ -180,6 +182,17 @@ bool InstructionWindow::moveEXtoMEM()
     // set usingIALU, usingFPU, executingBranch false based on instruction node type
     InstructionNode *instructionNode = instructionWindow[EX].front();
 
+    // if load type node and usingCRP is true, return false
+    if (instructionNode->isLoad() && usingCRP)
+    {
+        return false;
+    }
+    // if store type node and usingCWP is true, return false
+    else if (instructionNode->isStore() && usingCWP)
+    {
+        return false;
+    }
+
     // Reset usingIALU, usingFPU, and executingBranch flags based on the instruction node type
     if (instructionNode->isInteger())
     {
@@ -194,17 +207,7 @@ bool InstructionWindow::moveEXtoMEM()
         executingBranch = false;
     }
 
-    // if load type node and usingCRP is true, return false
-    if (instructionNode->isLoad() && usingCRP)
-    {
-        return false;
-    }
-    else if (instructionNode->isStore() && usingCWP)
-    {
-        return false;
-    }
-
-    // if store type node and usingCWP is true, return false
+    // set usingCRP or usingCWP true based on whether the node is a load or store type
     if (instructionNode->isLoad())
     {
         usingCRP = true;
@@ -213,10 +216,11 @@ bool InstructionWindow::moveEXtoMEM()
     {
         usingCWP = true;
     }
+
     // pop node from instructionWindow[EX] and push it to instructionWindow[MEM]
     instructionWindow[MEM].push_back(instructionWindow[EX].front());
     instructionWindow[EX].pop_front();
-    // set usingCRP or usingCWP true based on whether the node is a load or store type
+    
     return true;
 }
 
@@ -236,10 +240,9 @@ bool InstructionWindow::moveMEMtoWB()
     }
 
     // pop node from instructionWindow[MEM] and push it to instructionWindow[WB]
-    instructionWindow[WB].push_back(instructionWindow[MEM].front());
-    instructionWindow[MEM].pop_front();
-
     InstructionNode *instructionNode = instructionWindow[MEM].front();
+    instructionWindow[WB].push_back(instructionNode);
+    instructionWindow[MEM].pop_front();
 
     // Reset usingCRP or usingCWP flags based on whether the node is a load or store type
     if (instructionNode->isLoad())
@@ -267,17 +270,11 @@ bool InstructionWindow::moveWBtoDONE()
     {
         return false;
     }
+
     instructionWindow[WB].front()->completed = true;
     instructionWindow[WB].pop_front();
-    return false;
+    return true;
 }
-
-/**
- * @brief
- * check if there is instruction
- * @return 
- * returns true if the Window is empty
-*/
 
 bool InstructionWindow::isEmpty()
 {
