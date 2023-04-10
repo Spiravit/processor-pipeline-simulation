@@ -11,8 +11,8 @@
 
 /**
  * @brief
- * A class to read a file line by line.
- * this class will be replaced with the 'TreeFileParser' class
+ * A class to read a file line by line and parse the instructions 
+ * into InstructionNodes which are stored in an InstructionQueue
  */
 class FileReader
 {
@@ -31,11 +31,33 @@ private:
     
 };
 
+/**
+ * @brief
+ * Constructor for the FileReader class
+ * @param path
+ * the path to the trace file
+ * @param start_line
+ * the line to start parsing from (1 is the first line)
+ * @param instruction_count
+ * the number of instructions to parse
+*/
 FileReader::FileReader(const string path, size_t start_line, size_t instruction_count)
 {
     instructions_ = parseTraceFile(path, start_line, instruction_count);
 }
 
+/**
+ * @brief
+ * Parses a trace file and returns a list of instructions
+ * @param path
+ * the path to the trace file
+ * @param start_line
+ * the line to start parsing from (1 is the first line)
+ * @param instruction_count
+ * the number of instructions to parse
+ * @return
+ * a list of the instructions parsed from the trace file 
+*/
 InstructionQueue* FileReader::parseTraceFile(const string path, size_t start_line, size_t instruction_count)
 {
     InstructionQueue* instructions = new InstructionQueue();
@@ -48,8 +70,9 @@ InstructionQueue* FileReader::parseTraceFile(const string path, size_t start_lin
     }
 
     std::string line;
+    
     // Skip lines before the starting line
-    for (size_t i = 0; i < start_line && std::getline(trace_file, line); ++i)
+    for (size_t i = 1; i < start_line && std::getline(trace_file, line); ++i)
     {
     }
     size_t parsed_count = 0;
@@ -94,7 +117,11 @@ InstructionQueue* FileReader::getInstructions()
     return instructions_;
 }
 
-// Function to print the parsed instructions to the console
+/**
+ * @brief
+ * Prints the instructions to the console
+ * uses the instructions parsed from the constructor
+*/
 void FileReader::printInstructions()
 {
     for (const auto &instruction : instructions_->getInstructionQueue())
