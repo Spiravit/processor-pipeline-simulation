@@ -24,6 +24,9 @@ public:
     bool moveWBtoDONE();
 
     bool isEmpty();
+    bool checkDependencies(InstructionNode *instructionNode);
+    void print(unsigned int cycle);
+    void printInstruction(InstructionNode* node);
 
 private:
     unsigned int pipelineWidth;
@@ -282,13 +285,90 @@ bool InstructionWindow::moveWBtoDONE()
     return true;
 }
 
+/**
+ * @brief
+ * checks if the instruction window is empty.
+ * this does not check the WB stage because the simulation must end when last instructions hit WB
+ * @return
+ * returns true if the instruction window is empty, false otherwise
+ */
 bool InstructionWindow::isEmpty()
 {
     return (
         instructionWindow[IF].empty() && 
         instructionWindow[ID].empty() && 
         instructionWindow[EX].empty() && 
-        instructionWindow[MEM].empty() && 
-        instructionWindow[WB].empty()
+        instructionWindow[MEM].empty()
     );
+}
+
+bool InstructionWindow::checkDependencies(InstructionNode *instructionNode)
+{
+    // check if the instruction node has any dependencies
+    if (instructionNode->dependencies.size() > 0)
+    {
+        // check if the instruction node has any dependencies that are not complete
+        for (const std::string &dependency : instructionNode->dependencies)
+        {
+            if (!instructionHistory->isComplete(dependency))
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+void InstructionWindow::print(unsigned int cycle) 
+{
+    std::cout << "================== " << cycle << " ==================" << std::endl;
+    std::cout << "----IF---- " << std::endl;
+    for (InstructionNode *instructionNode : instructionWindow[IF])
+    {
+        printInstruction(instructionNode);
+    }
+    std::cout << std::endl;
+
+    std::cout << "----ID----" << std::endl;
+    for (InstructionNode *instructionNode : instructionWindow[ID])
+    {
+        printInstruction(instructionNode);
+    }
+    std::cout << std::endl;
+
+    std::cout << "----EX----" << std::endl;
+    for (InstructionNode *instructionNode : instructionWindow[EX])
+    {
+        printInstruction(instructionNode);
+    }
+    std::cout << std::endl;
+
+    std::cout << "----MEM----" << std::endl;
+    for (InstructionNode *instructionNode : instructionWindow[MEM])
+    {
+        printInstruction(instructionNode);
+    }
+    std::cout << std::endl;
+
+    std::cout << "----WB----" << std::endl;
+    for (InstructionNode *instructionNode : instructionWindow[WB])
+    {
+        printInstruction(instructionNode);
+    }
+    std::cout << std::endl;
+}
+
+void InstructionWindow::printInstruction(InstructionNode* node) {
+    std::cout << "instruction = { " << std::endl; 
+    std::cout << "  PC = " <<  node->PC << ", " << std::endl;
+    std::cout << "  type = "<< node->type << ", " << std::endl;
+    std::cout << "  dependanciesSatisfied = " << checkDependencies(node) << ", " << std::endl;
+    cout << "   dependancies = [" << std::endl;
+    for (const std::string &dependency : node->dependencies)
+    {
+        std::cout << "     {PC = " <<  dependency << ", " << std::endl;
+        std::cout << "      isSatisfied = " << instructionHistory->isComplete(dependency) << "}, " << std::endl;
+    }
+    cout << "]}, " << std::endl;
 }
