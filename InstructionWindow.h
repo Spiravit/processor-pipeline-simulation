@@ -134,7 +134,7 @@ bool InstructionWindow::moveIDtoEX()
         return false;
     }
 
-    for (const unsigned long long dependency : instructionNode->dependencies)
+    for (const std::string &dependency : instructionNode->dependencies)
     {
         if (!instructionHistory->isComplete(dependency))
         {
@@ -144,11 +144,6 @@ bool InstructionWindow::moveIDtoEX()
 
     // Add the instructionNode to the instruction history
     instructionHistory->insert(instructionNode);
-
-    // pop node from instructionWindow[ID] and push it to instructionWindow[EX]
-    instructionWindow[EX].push_back(instructionNode);
-    
-    instructionWindow[ID].pop_front();
 
     // set usingIALU true if instruction node is a integer type
     if (instructionNode->isInteger())
@@ -160,6 +155,10 @@ bool InstructionWindow::moveIDtoEX()
     {
         usingFPU = true;
     }
+
+    // pop node from instructionWindow[ID] and push it to instructionWindow[EX]
+    instructionWindow[EX].push_back(instructionNode);
+    instructionWindow[ID].pop_front();
     
     return true;
 }
@@ -245,8 +244,6 @@ bool InstructionWindow::moveMEMtoWB()
 
     // pop node from instructionWindow[MEM] and push it to instructionWindow[WB]
     InstructionNode *instructionNode = instructionWindow[MEM].front();
-    instructionWindow[WB].push_back(instructionNode);
-    instructionWindow[MEM].pop_front();
 
     // Reset usingCRP or usingCWP flags based on whether the node is a load or store type
     // and set the instruction node to complete
@@ -260,6 +257,9 @@ bool InstructionWindow::moveMEMtoWB()
         usingCWP = false;
         instructionNode->completed = true;
     }
+
+    instructionWindow[WB].push_back(instructionNode);
+    instructionWindow[MEM].pop_front();
 
     return true;
 }

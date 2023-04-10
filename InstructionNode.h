@@ -25,13 +25,13 @@ enum class InstructionType
 class InstructionNode
 {
 public:
-    unsigned long long PC;
+    std::string PC;
     int type;                        // int instruction type : 1 = integer, 2 = float, 3 = branch, 4 = load, 5 = store
     InstructionType instructionType; // Enum instruction type (integer, float, branch, load, store)
-    std::vector<unsigned long long> dependencies;
-    bool completed;
+    std::vector<std::string> dependencies;
+    bool completed = false;
 
-    InstructionNode(unsigned long long PC, int type, const std::vector<unsigned long long> &dependencies)
+    InstructionNode(std::string PC, int type, const std::vector<std::string> &dependencies)
         : PC(PC), type(type), dependencies(dependencies)
     {
         instructionType = toInstructionType(type);
