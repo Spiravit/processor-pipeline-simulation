@@ -2,9 +2,6 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <iomanip>
-
-#include <limits>
 
 #include "InstructionNode.h"
 #include "InstructionQueue.h"
@@ -70,7 +67,7 @@ InstructionQueue* FileReader::parseTraceFile(const string path, size_t start_lin
     }
 
     std::string line;
-    
+
     // Skip lines before the starting line
     for (size_t i = 1; i < start_line && std::getline(trace_file, line); ++i)
     {
@@ -84,11 +81,7 @@ InstructionQueue* FileReader::parseTraceFile(const string path, size_t start_lin
 
         // Parse program counter (PC)
         std::getline(ss, token, ',');
-
         std::string PC = token;
-        
-        // cout << "hex: " << token << endl;
-        // cout << "PC: " << PC << endl;
 
         // Parse instruction type
         std::getline(ss, token, ',');

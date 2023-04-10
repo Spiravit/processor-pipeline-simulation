@@ -33,14 +33,22 @@ void Simulator::start() {
     InstructionNode* instructionNode = instructionQueue->front();
 
     while (!instructionQueue->isEmpty() || !instructionWindow->isEmpty()) {
-        
+        // move instructions through the pipeline
+        // call moveWBtoDONE() until it returns false
         while (instructionWindow->moveWBtoDONE()) {}
+        // call moveMEMtoWB() until it returns false
         while (instructionWindow->moveMEMtoWB()) {}
+        // call moveEXtoMEM() until it returns false
         while (instructionWindow->moveEXtoMEM()) {}
+        // call moveIDtoEX() until it returns false
         while (instructionWindow->moveIDtoEX()) {}
+        // call moveIFtoID() until it returns false
         while (instructionWindow->moveIFtoID()) {} 
+        // call moveToIF() until it returns false or the instructionQueue is empty
         while (instructionNode != nullptr && instructionWindow->moveToIF(instructionNode)) {
             instructionQueue->pop();
+
+            // increment instruction type count
             switch (instructionNode->instructionType) {
                 case InstructionType::INTEGER:
                     integerCount++;

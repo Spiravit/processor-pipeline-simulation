@@ -137,6 +137,7 @@ bool InstructionWindow::moveIDtoEX()
         return false;
     }
 
+    // check if the instruction node has any incomplete dependencies
     for (const std::string &dependency : instructionNode->dependencies)
     {
         if (!instructionHistory->isComplete(dependency))
@@ -245,7 +246,6 @@ bool InstructionWindow::moveMEMtoWB()
         return false;
     }
 
-    // pop node from instructionWindow[MEM] and push it to instructionWindow[WB]
     InstructionNode *instructionNode = instructionWindow[MEM].front();
 
     // Reset usingCRP or usingCWP flags based on whether the node is a load or store type
@@ -261,6 +261,7 @@ bool InstructionWindow::moveMEMtoWB()
         instructionNode->completed = true;
     }
 
+    // pop node from instructionWindow[MEM] and push it to instructionWindow[WB]
     instructionWindow[WB].push_back(instructionNode);
     instructionWindow[MEM].pop_front();
 
@@ -363,8 +364,8 @@ void InstructionWindow::printInstruction(InstructionNode* node) {
     std::cout << "instruction = { " << std::endl; 
     std::cout << "  PC = " <<  node->PC << ", " << std::endl;
     std::cout << "  type = "<< node->type << ", " << std::endl;
-    std::cout << "  dependanciesSatisfied = " << checkDependencies(node) << ", " << std::endl;
-    cout << "   dependancies = [" << std::endl;
+    std::cout << "  dependenciesSatisfied = " << checkDependencies(node) << ", " << std::endl;
+    cout << "   dependencies = [" << std::endl;
     for (const std::string &dependency : node->dependencies)
     {
         std::cout << "     {PC = " <<  dependency << ", " << std::endl;
