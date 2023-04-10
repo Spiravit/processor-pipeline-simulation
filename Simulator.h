@@ -30,37 +30,25 @@ Simulator::Simulator(InstructionQueue* instructionQueue, int pipelineWidth) {
 }
 
 void Simulator::start() {
-    // repeat until InstuctionQueue and InstructionWindow are empty
-        // call instructionWindow.moveWBtoDONE() in a while loop until it returns false
-        // call instructionWindow.moveMEMtoWB() in a while loop until it returns false
-        // call instructionWindow.moveEXtoMEM() in a while loop until it returns false
-        // call instructionWindow.moveIDtoEX() in a while loop until it returns false
-        // call instructionWindow.moveIFtoID() in a while loop until it returns false
-        // call instructionWindow.modeToIF(InstructionNode* instructionNode) in a while loop until it returns false or until InstructionQueue is empty
-            // if true is returned, pop node from InstructionQueue
-            // increment count of instruction type
-        // increment instructionCycleCount 
-    
     InstructionNode* instructionNode = instructionQueue->front();
 
     while (!instructionQueue->isEmpty() || !instructionWindow->isEmpty()) {
-        while (instructionWindow->moveWBtoDONE()) {
-            //do something
-        }
-        while (instructionWindow->moveMEMtoWB()) {
-            //do something
-        }
-        while (instructionWindow->moveEXtoMEM()) {
-            //do something
-        }
-        while (instructionWindow->moveIDtoEX()) {
-            //do something
-        }
-        while (instructionWindow->moveIFtoID()) {
-            //do something
-        } 
+        // move instructions through the pipeline
+        // call moveWBtoDONE() until it returns false
+        while (instructionWindow->moveWBtoDONE()) {}
+        // call moveMEMtoWB() until it returns false
+        while (instructionWindow->moveMEMtoWB()) {}
+        // call moveEXtoMEM() until it returns false
+        while (instructionWindow->moveEXtoMEM()) {}
+        // call moveIDtoEX() until it returns false
+        while (instructionWindow->moveIDtoEX()) {}
+        // call moveIFtoID() until it returns false
+        while (instructionWindow->moveIFtoID()) {} 
+        // call moveToIF() until it returns false or the instructionQueue is empty
         while (instructionNode != nullptr && instructionWindow->moveToIF(instructionNode)) {
             instructionQueue->pop();
+
+            // increment instruction type count
             switch (instructionNode->instructionType) {
                 case InstructionType::INTEGER:
                     integerCount++;
@@ -86,6 +74,7 @@ void Simulator::start() {
         }
 
         instructionCycleCount++;
+        //instructionWindow->print(instructionCycleCount);
     }
 
 

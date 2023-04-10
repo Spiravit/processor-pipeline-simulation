@@ -14,19 +14,19 @@ public:
     ~InstructionHistory();
 
     void insert(InstructionNode* instructionNode);
-    void erase(unsigned int PC);
-    bool isComplete(const unsigned int PC);
+    void erase(std::string PC);
+    bool isComplete(const std::string PC);
     
 private:
-    std::map<unsigned int, InstructionNode*> instructionHistory;
+    std::map<std::string, InstructionNode*> instructionHistory;
 };
 
 InstructionHistory::InstructionHistory() {
-    std::map<unsigned int, InstructionNode*> instructionHistory = std::map<unsigned int, InstructionNode*>();
+    std::map<std::string, InstructionNode*> instructionHistory = std::map<std::string, InstructionNode*>();
 }
 
 InstructionHistory::~InstructionHistory() {
-    for (std::map<unsigned int, InstructionNode*>::iterator it = instructionHistory.begin(); it != instructionHistory.end(); ++it) {
+    for (std::map<std::string, InstructionNode*>::iterator it = instructionHistory.begin(); it != instructionHistory.end(); ++it) {
         delete it->second;
     }
 }
@@ -40,7 +40,7 @@ void InstructionHistory::insert(InstructionNode* instructionNode) {
 
     // pairs up the node and its key(PC)
     instructionHistory.insert(
-        std::pair<unsigned int, InstructionNode*>(
+        std::pair<std::string, InstructionNode*>(
             instructionNode->PC,
             instructionNode
         )
@@ -50,8 +50,8 @@ void InstructionHistory::insert(InstructionNode* instructionNode) {
 /**
  * remove and free a instruction from the history
 */
-void InstructionHistory::erase(unsigned int PC) {
-    std::map<unsigned int, InstructionNode*>::iterator it = instructionHistory.find(PC);
+void InstructionHistory::erase(std::string PC) {
+    std::map<std::string, InstructionNode*>::iterator it = instructionHistory.find(PC);
 
     if (it != instructionHistory.end()) { // if the instruction exists 
         instructionHistory.erase(it);
@@ -63,8 +63,8 @@ void InstructionHistory::erase(unsigned int PC) {
 /**
  * returns true/false if the instruction has completed and been retired
 */
-bool InstructionHistory::isComplete(const unsigned int PC) {
-    std::map<unsigned int, InstructionNode*>::iterator it = instructionHistory.find(PC);
+bool InstructionHistory::isComplete(const std::string PC) {
+    std::map<std::string, InstructionNode*>::iterator it = instructionHistory.find(PC);
 
     if (it != instructionHistory.end()) { // if the instruction exists
         // second is used to access the node out of the pair

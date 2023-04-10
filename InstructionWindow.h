@@ -24,6 +24,9 @@ public:
     bool moveWBtoDONE();
 
     bool isEmpty();
+    bool checkDependencies(InstructionNode *instructionNode);
+    void print(unsigned int cycle);
+    void printInstruction(InstructionNode* node);
 
 private:
     unsigned int pipelineWidth;
@@ -134,7 +137,8 @@ bool InstructionWindow::moveIDtoEX()
         return false;
     }
 
-    for (const unsigned int dependency : instructionNode->dependencies)
+    // check if the instruction node has any incomplete dependencies
+    for (const std::string &dependency : instructionNode->dependencies)
     {
         if (!instructionHistory->isComplete(dependency))
         {
@@ -144,11 +148,6 @@ bool InstructionWindow::moveIDtoEX()
 
     // Add the instructionNode to the instruction history
     instructionHistory->insert(instructionNode);
-
-    // pop node from instructionWindow[ID] and push it to instructionWindow[EX]
-    instructionWindow[EX].push_back(instructionNode);
-    
-    instructionWindow[ID].pop_front();
 
     // set usingIALU true if instruction node is a integer type
     if (instructionNode->isInteger())
@@ -160,6 +159,10 @@ bool InstructionWindow::moveIDtoEX()
     {
         usingFPU = true;
     }
+
+    // pop node from instructionWindow[ID] and push it to instructionWindow[EX]
+    instructionWindow[EX].push_back(instructionNode);
+    instructionWindow[ID].pop_front();
     
     return true;
 }
@@ -194,17 +197,21 @@ bool InstructionWindow::moveEXtoMEM()
     }
 
     // Reset usingIALU, usingFPU, and executingBranch flags based on the instruction node type
+    // set completed flag to true
     if (instructionNode->isInteger())
     {
         usingIALU = false;
+        instructionNode->completed = true;
     }
     else if (instructionNode->isFloat())
     {
         usingFPU = false;
+        instructionNode->completed = true;
     }
     else if (instructionNode->isBranch())
     {
         executingBranch = false;
+        instructionNode->completed = true;
     }
 
     // set usingCRP or usingCWP true based on whether the node is a load or store type
@@ -239,20 +246,24 @@ bool InstructionWindow::moveMEMtoWB()
         return false;
     }
 
-    // pop node from instructionWindow[MEM] and push it to instructionWindow[WB]
     InstructionNode *instructionNode = instructionWindow[MEM].front();
-    instructionWindow[WB].push_back(instructionNode);
-    instructionWindow[MEM].pop_front();
 
     // Reset usingCRP or usingCWP flags based on whether the node is a load or store type
+    // and set the instruction node to complete
     if (instructionNode->isLoad())
     {
         usingCRP = false;
+        instructionNode->completed = true;
     }
     else if (instructionNode->isStore())
     {
         usingCWP = false;
+        instructionNode->completed = true;
     }
+
+    // pop node from instructionWindow[MEM] and push it to instructionWindow[WB]
+    instructionWindow[WB].push_back(instructionNode);
+    instructionWindow[MEM].pop_front();
 
     return true;
 }
@@ -271,12 +282,94 @@ bool InstructionWindow::moveWBtoDONE()
         return false;
     }
 
-    instructionWindow[WB].front()->completed = true;
     instructionWindow[WB].pop_front();
     return true;
 }
 
+/**
+ * @brief
+ * checks if the instruction window is empty.
+ * this does not check the WB stage because the simulation must end when last instructions hit WB
+ * @return
+ * returns true if the instruction window is empty, false otherwise
+ */
 bool InstructionWindow::isEmpty()
 {
-    return (instructionWindow[IF].empty() && instructionWindow[ID].empty() && instructionWindow[EX].empty() && instructionWindow[MEM].empty() && instructionWindow[WB].empty());
+    return (
+        instructionWindow[IF].empty() && 
+        instructionWindow[ID].empty() && 
+        instructionWindow[EX].empty() && 
+        instructionWindow[MEM].empty()
+    );
+}
+
+bool InstructionWindow::checkDependencies(InstructionNode *instructionNode)
+{
+    // check if the instruction node has any dependencies
+    if (instructionNode->dependencies.size() > 0)
+    {
+        // check if the instruction node has any dependencies that are not complete
+        for (const std::string &dependency : instructionNode->dependencies)
+        {
+            if (!instructionHistory->isComplete(dependency))
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+void InstructionWindow::print(unsigned int cycle) 
+{
+    std::cout << "================== " << cycle << " ==================" << std::endl;
+    std::cout << "----IF---- " << std::endl;
+    for (InstructionNode *instructionNode : instructionWindow[IF])
+    {
+        printInstruction(instructionNode);
+    }
+    std::cout << std::endl;
+
+    std::cout << "----ID----" << std::endl;
+    for (InstructionNode *instructionNode : instructionWindow[ID])
+    {
+        printInstruction(instructionNode);
+    }
+    std::cout << std::endl;
+
+    std::cout << "----EX----" << std::endl;
+    for (InstructionNode *instructionNode : instructionWindow[EX])
+    {
+        printInstruction(instructionNode);
+    }
+    std::cout << std::endl;
+
+    std::cout << "----MEM----" << std::endl;
+    for (InstructionNode *instructionNode : instructionWindow[MEM])
+    {
+        printInstruction(instructionNode);
+    }
+    std::cout << std::endl;
+
+    std::cout << "----WB----" << std::endl;
+    for (InstructionNode *instructionNode : instructionWindow[WB])
+    {
+        printInstruction(instructionNode);
+    }
+    std::cout << std::endl;
+}
+
+void InstructionWindow::printInstruction(InstructionNode* node) {
+    std::cout << "instruction = { " << std::endl; 
+    std::cout << "  PC = " <<  node->PC << ", " << std::endl;
+    std::cout << "  type = "<< node->type << ", " << std::endl;
+    std::cout << "  dependenciesSatisfied = " << checkDependencies(node) << ", " << std::endl;
+    cout << "   dependencies = [" << std::endl;
+    for (const std::string &dependency : node->dependencies)
+    {
+        std::cout << "     {PC = " <<  dependency << ", " << std::endl;
+        std::cout << "      isSatisfied = " << instructionHistory->isComplete(dependency) << "}, " << std::endl;
+    }
+    cout << "]}, " << std::endl;
 }
