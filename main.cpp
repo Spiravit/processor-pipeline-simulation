@@ -32,5 +32,7 @@ int main(int argc, char *argv[])
 
     Simulator simulator = Simulator(instructionQueue, pipelineWidth);
     simulator.start();
+
+    delete instructionQueue;
     return 0;
 }
