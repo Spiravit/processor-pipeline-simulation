@@ -6,6 +6,8 @@
 class Simulator {
 public:
     Simulator(InstructionQueue* instructionQueue, int pipelineWidth);
+    ~Simulator();
+
     void start();
 
 private:
@@ -29,8 +31,15 @@ Simulator::Simulator(InstructionQueue* instructionQueue, int pipelineWidth) {
     this->instructionWindow = new InstructionWindow(pipelineWidth);
 }
 
+Simulator::~Simulator() {
+    delete instructionWindow;
+}
+
 void Simulator::start() {
-    InstructionNode* instructionNode = instructionQueue->front();
+    InstructionNode* instructionNode = nullptr;
+    if (!instructionQueue->isEmpty()) {
+        instructionNode = instructionQueue->front();
+    }
 
     while (!instructionQueue->isEmpty() || !instructionWindow->isEmpty()) {
         // move instructions through the pipeline
@@ -47,7 +56,7 @@ void Simulator::start() {
         // call moveToIF() until it returns false or the instructionQueue is empty
         while (instructionNode != nullptr && instructionWindow->moveToIF(instructionNode)) {
             instructionQueue->pop();
-
+            
             // increment instruction type count
             switch (instructionNode->instructionType) {
                 case InstructionType::INTEGER:
@@ -67,7 +76,6 @@ void Simulator::start() {
                     break;
                 default :
                     throw "Invalid Instruction Type in Simulator::start()";
-
             }
             
             instructionNode = instructionQueue->front();
@@ -77,10 +85,8 @@ void Simulator::start() {
         //instructionWindow->print(instructionCycleCount);
     }
 
-
     // print results at the end of the simulation 
     printResults();
-    delete instructionWindow;
 }
 
 void Simulator::printResults() {
