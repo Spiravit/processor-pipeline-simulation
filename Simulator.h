@@ -80,6 +80,7 @@ void Simulator::start() {
 
     // print results at the end of the simulation 
     printResults();
+    delete instructionWindow;
 }
 
 void Simulator::printResults() {

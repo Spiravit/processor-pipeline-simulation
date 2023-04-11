@@ -13,6 +13,7 @@ class InstructionWindow
 {
 public:
     InstructionWindow(unsigned int pipelineWidth);
+    ~InstructionWindow();
 
     // methods to switch instructions between stages
 
@@ -63,6 +64,11 @@ InstructionWindow::InstructionWindow(unsigned int pipelineWidth)
     }
 
     instructionHistory = new InstructionHistory();
+}
+
+InstructionWindow::~InstructionWindow()
+{
+    delete instructionHistory;
 }
 
 /**

@@ -54,9 +54,8 @@ void InstructionHistory::erase(std::string PC) {
     std::map<std::string, InstructionNode*>::iterator it = instructionHistory.find(PC);
 
     if (it != instructionHistory.end()) { // if the instruction exists 
+        delete it->second;
         instructionHistory.erase(it);
-        //delete it->second;
-        // TODO: fix this delete statement, it causes a crash
     }
 }
 
