@@ -30,9 +30,10 @@ int main(int argc, char *argv[])
     //parser.printInstructions();
 
 
-    Simulator simulator = Simulator(instructionQueue, pipelineWidth);
-    simulator.start();
+    Simulator* simulator = new Simulator(instructionQueue, pipelineWidth);
+    simulator->start();
 
     delete instructionQueue;
+    delete simulator;
     return 0;
 }

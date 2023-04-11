@@ -57,6 +57,9 @@ InstructionNode* InstructionQueue::pop() {
  * the popped instruction
 */
 InstructionNode* InstructionQueue::front() {
+    if (instructionQueue.empty()) {
+        return nullptr;
+    }
     InstructionNode* instructionNode = instructionQueue.front();
     return instructionNode;
 }
