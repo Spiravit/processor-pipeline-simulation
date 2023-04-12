@@ -237,16 +237,18 @@ void InstructionWindow::setEXNodeComplete(InstructionNode* instructionNode)
         if (instructionNode->isInteger())
         {
             usingIALU = false;
+            instructionNode->completed = true;
         }
         else if (instructionNode->isFloat())
         {
             usingFPU = false;
+            instructionNode->completed = true;
         }
         else if (instructionNode->isBranch())
         {
             executingBranch = false;
+            instructionNode->completed = true;
         }
-        instructionNode->completed = true;
     }
     
 }
@@ -298,12 +300,13 @@ void InstructionWindow::setMEMNodeComplete(InstructionNode *instructionNode)
         if (instructionNode->isLoad())
         {
             usingCRP = false;
+            instructionNode->completed = true;
         }
         else if (instructionNode->isStore())
         {
             usingCWP = false;
+            instructionNode->completed = true;
         }
-        instructionNode->completed = true;
     }
 }
 
