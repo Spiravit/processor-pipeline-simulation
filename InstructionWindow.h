@@ -228,18 +228,24 @@ void InstructionWindow::setEXtoMEMNodeComplete(InstructionNode* instructionNode)
     // set completed flag to true
     if (instructionNode->isInteger())
     {
-        usingIALU = false;
-        instructionNode->completed = true;
+        if (!instructionNode->completed) {
+            usingIALU = false;
+            instructionNode->completed = true;
+        }
     }
     else if (instructionNode->isFloat())
     {
-        usingFPU = false;
-        instructionNode->completed = true;
+        if (!instructionNode->completed) {
+            usingFPU = false;
+            instructionNode->completed = true;
+        }
     }
     else if (instructionNode->isBranch())
     {
-        executingBranch = false;
-        instructionNode->completed = true;
+        if (!instructionNode->completed) {
+            executingBranch = false;
+            instructionNode->completed = true;
+        }
     }
 }
 
@@ -281,13 +287,17 @@ void InstructionWindow::setMEMtoWBNodeComplete(InstructionNode *instructionNode)
     // and set the instruction node to complete
     if (instructionNode->isLoad())
     {
-        usingCRP = false;
-        instructionNode->completed = true;
+        if (!instructionNode->completed) {
+            usingCRP = false;
+            instructionNode->completed = true;
+        }   
     }
     else if (instructionNode->isStore())
     {
-        usingCWP = false;
-        instructionNode->completed = true;
+        if (!instructionNode->completed) {
+            usingCWP = false;
+            instructionNode->completed = true;
+        }
     }
 }
 
