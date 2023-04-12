@@ -37,6 +37,11 @@ private:
 
     InstructionHistory *instructionHistory;
 
+    // methods below are to set the instruction to complete after it completes a cycle in a stage
+
+    void setEXNodeComplete(InstructionNode *instructionNode);
+    void setMEMNodeComplete(InstructionNode *instructionNode);
+
     // variables used to determine if an incoming
     // node must be denied an instruction switch
     bool usingIALU = false;       // integer ALU
@@ -182,43 +187,23 @@ bool InstructionWindow::moveIDtoEX()
  */
 bool InstructionWindow::moveEXtoMEM()
 {
-    // if EX empty or if MEM full, return false
-    if (instructionWindow[EX].empty() || instructionWindow[MEM].size() >= this->pipelineWidth)
-    {
-        return false;
-    }
-
-    // set usingIALU, usingFPU, executingBranch false based on instruction node type
     InstructionNode *instructionNode = instructionWindow[EX].front();
-
-    // if load type node and usingCRP is true, return false
-    if (instructionNode->isLoad() && usingCRP)
+    
+    // if EX instruction doesnt satisfy any dependency, return false
+    if (instructionWindow[EX].empty() 
+    || instructionWindow[MEM].size() >= this->pipelineWidth
+    || (instructionNode->isLoad() && usingCRP)
+    || (instructionNode->isStore() && usingCWP))
     {
+        // set all blocked nodes to complete
+        for (InstructionNode *instructionNode : instructionWindow[EX])
+        {
+            setEXNodeComplete(instructionNode);
+        }
         return false;
     }
-    // if store type node and usingCWP is true, return false
-    else if (instructionNode->isStore() && usingCWP)
-    {
-        return false;
-    }
 
-    // Reset usingIALU, usingFPU, and executingBranch flags based on the instruction node type
-    // set completed flag to true
-    if (instructionNode->isInteger())
-    {
-        usingIALU = false;
-        instructionNode->completed = true;
-    }
-    else if (instructionNode->isFloat())
-    {
-        usingFPU = false;
-        instructionNode->completed = true;
-    }
-    else if (instructionNode->isBranch())
-    {
-        executingBranch = false;
-        instructionNode->completed = true;
-    }
+    setEXNodeComplete(instructionNode);
 
     // set usingCRP or usingCWP true based on whether the node is a load or store type
     if (instructionNode->isLoad())
@@ -239,6 +224,37 @@ bool InstructionWindow::moveEXtoMEM()
 
 /**
  * @brief
+ * sets the completed flag of the given node to true
+ * this node should be in the execute stage
+ * @param instructionNode
+ * the node to be set to complete
+*/
+void InstructionWindow::setEXNodeComplete(InstructionNode* instructionNode) 
+{
+    // only set the node to complete if it is not already complete
+    if (!instructionNode->completed) {
+        // Reset usingIALU, usingFPU, and executingBranch flags based on the instruction node type
+        if (instructionNode->isInteger())
+        {
+            usingIALU = false;
+            instructionNode->completed = true;
+        }
+        else if (instructionNode->isFloat())
+        {
+            usingFPU = false;
+            instructionNode->completed = true;
+        }
+        else if (instructionNode->isBranch())
+        {
+            executingBranch = false;
+            instructionNode->completed = true;
+        }
+    }
+    
+}
+
+/**
+ * @brief
  * removes the next node from the read(store) or write(load) stage and
  * adds it to the memory write back stage
  * @return
@@ -247,31 +263,51 @@ bool InstructionWindow::moveEXtoMEM()
 bool InstructionWindow::moveMEMtoWB()
 {
     // if MEM empty, || WB full return false
-    if (instructionWindow[MEM].empty() || instructionWindow[WB].size() >= this->pipelineWidth)
+    if (instructionWindow[MEM].empty() 
+    || instructionWindow[WB].size() >= this->pipelineWidth)
     {
+        // set all blocked nodes to complete
+        for (InstructionNode *instructionNode : instructionWindow[MEM])
+        {
+            setMEMNodeComplete(instructionNode);
+        }
         return false;
     }
 
     InstructionNode *instructionNode = instructionWindow[MEM].front();
 
-    // Reset usingCRP or usingCWP flags based on whether the node is a load or store type
-    // and set the instruction node to complete
-    if (instructionNode->isLoad())
-    {
-        usingCRP = false;
-        instructionNode->completed = true;
-    }
-    else if (instructionNode->isStore())
-    {
-        usingCWP = false;
-        instructionNode->completed = true;
-    }
+    setMEMNodeComplete(instructionNode);
 
     // pop node from instructionWindow[MEM] and push it to instructionWindow[WB]
     instructionWindow[WB].push_back(instructionNode);
     instructionWindow[MEM].pop_front();
 
     return true;
+}
+
+/**
+ * @brief
+ * sets the completed flag of the given node to true
+ * this node should be in the memory stage
+ * @param instructionNode
+ * the node to be set to complete
+*/
+void InstructionWindow::setMEMNodeComplete(InstructionNode *instructionNode)
+{
+    // only set the node to complete if it is not already complete
+    if (!instructionNode->completed) {
+        // Reset usingCRP or usingCWP flags based on whether the node is a load or store type
+        if (instructionNode->isLoad())
+        {
+            usingCRP = false;
+            instructionNode->completed = true;
+        }
+        else if (instructionNode->isStore())
+        {
+            usingCWP = false;
+            instructionNode->completed = true;
+        }
+    }
 }
 
 /**
