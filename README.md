@@ -1,9 +1,9 @@
-<div align="center"><h1>Pipeline Processor</h1></div>
+<div align="center"><h1>Processor Pipeline</h1></div>
 <div align="center"><h3>Trace Driven Simulation</h3></div>
 <div align="center"><img src="https://user-images.githubusercontent.com/67299491/231928463-b122bf04-d97c-4601-97dd-7f2a96442346.png" width=300 height=300 style="vertical-align:middle"></div>
 
-
 </br>
+
 
 
 
@@ -11,19 +11,35 @@
 <pre><div align="center"><img style="margin-right: 5px;" src="https://img.shields.io/badge/c-++-blue"/> <img src="https://img.shields.io/badge/%20%20valgrind-white"/> <img src="https://img.shields.io/badge/%20%20Contributers-3-3"/> </pre> 
 
 
-
 # Table of Content:
+- [Project Description](#project-description)
+- [Simplifying Assumptions](#simplifying-assumptions)
 - [Trace files](#trace-files)
 - [Tracking Dependencies](#tracking-dependencies)
 - [Running the project](#running-the-project)
 - [Results](#results)
 - [Two factor analysis](#two-factor-analysis)
 
+## Project Description
 
+A trace driven processor pipeline simulator which was designed and implemented as part of our Computer Simulation and Modeling course at Simon Fraser University. Our goal was to experiment with a simplified processor pipeline using trace-driven methods. The project was implemented in C++ and was tested using valgrind.
+
+
+## Simplifying Assumptions
+
+This project is not a full processor simulator. It is a simplified simulator that includes key parts of the pipeline stages in a processor. The following simplifying assumptions are made:
+
+- No branch prediction.
+- All instruction fetches hit in the L1 instruction cache and don’t need to read from memory.
+- All memory operations (loads and stores) hit in the L1 data cache and don’t need to read/write from/to memory.
+- Integer and floating point operations execute in 1 cycle.
+- Any branch instruction delays instruction fetch until after the branch executes. The next instruction(s) to be fetched will go to the IF stage in the cycle after the branch finishes the EX stage.
+- All loads and stores access the L1 data cache in 1 cycle.
 
 
 
 ## Trace files
+
 This simulator will consume a trace with the following format: Each line represents an instruction with comma separated values representing the following:
 
 - Instruction program counter (PC): A hexadecimal value representing the instruction address.
@@ -35,6 +51,20 @@ This simulator will consume a trace with the following format: Each line represe
         - Store: An instruction that writes a value to memory.
 - A list of PC values for instructions that the current instruction depends on. Some instructions don’t have any dependences, so this list will be empty. Other instructions depend on 1-4 other instructions. Note that PC values correspond to static instructions, and the trace could have multiple dynamic instructions with the same PC value. For dependences, an instruction is dependent on the last instance of the dynamic instruction with that PC value. 
 
+Provided trace files can be found under the `traces/` directory. There are 3 trace provided trace files:
+
+- `srv_0.gz`
+    - server trace
+- `compute_int_0.gz`
+    - trace that contains predominantly integer instructions
+- `compute_fp_1.gz`
+    - trace that contains predominantly floating point instructions
+
+The trace files are compressed using gzip. You can decompress them using the following command:
+```
+gunzip trace_file.gz
+```
+
 ## Tracking Dependencies
 
 Each instruction can execute as long as its dependences are satisfied. The simulator tracks for each instruction that fall into the following three categories:
@@ -45,11 +75,14 @@ Each instruction can execute as long as its dependences are satisfied. The simul
 
 
 ## Running the project
+
 - Clone the repo
 - Open the project is VS code (or your favorite editor)
-- Run make
-- Run 
-    ```./proj path_to_trace_file start_instruction_# instruction_count pipeline_width```
+- Setup your traces files as outlined in the [Trace files](#trace-files) section above.
+- Run `make` to compile the project
+- Run the project with the following launch parameters
+    
+    ``` ./proj path_to_trace_file start_instruction_# instruction_count pipeline_width ```
 
 
 
