@@ -102,7 +102,7 @@ Each instruction can execute as long as its dependences are satisfied. The simul
 ![image](https://user-images.githubusercontent.com/67299491/231927783-58d16600-4f10-4087-b8f8-84bd66ff3a0d.png)
 
 
-![image](https://user-images.githubusercontent.com/67299491/231927810-1ce5c09e-9251-4627-8e88-359e5a0e23ad.png)
+![image](https://user-images.githubusercontent.com/80385814/233877175-f586ed1e-0bd4-47a7-86e1-7ad44c9d425d.png)
 
 
 
